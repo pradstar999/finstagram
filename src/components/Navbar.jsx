@@ -1,14 +1,14 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Home, Search, PlusSquare, Film, User, MessageCircle, Moon, Sun, Menu } from 'lucide-react'
+import { Home, Search, PlusSquare, Film, User, MessageCircle, Moon, Sun, Menu, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { useState } from 'react'
+import { useSidebar } from '../context/SidebarContext'
 
 export default function Navbar() {
   const { profile } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { sidebarOpen, setSidebarOpen } = useSidebar()
   const location = useLocation()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const isActive = (path) => location.pathname === path
 
@@ -21,24 +21,51 @@ export default function Navbar() {
     { to: `/profile/${profile?.username}`, icon: User, label: 'Profile', isProfile: true },
   ]
 
+  const sidebarWidth = sidebarOpen ? 256 : 80
+
   return (
     <>
       {/* ── Desktop Sidebar ── */}
       <nav style={{
         position: 'fixed', left: 0, top: 0, height: '100%',
-        width: 'var(--nav-width)',
+        width: sidebarWidth,
         background: 'var(--surface)',
         borderRight: '1px solid var(--border)',
         display: 'flex', flexDirection: 'column',
         padding: '24px 12px',
         zIndex: 100,
-        transition: 'background 0.3s ease',
+        transition: 'width 0.3s ease',
       }} className="hidden md:flex">
 
-        {/* Logo */}
-        <Link to="/" style={{ padding: '8px 12px', marginBottom: 24, display: 'block' }}>
-          <span className="logo" style={{ fontSize: 26, color: 'var(--text)' }}>Finstagram</span>
-        </Link>
+        {/* Logo / Collapse Button Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'space-between' : 'center', marginBottom: 24, gap: 8 }}>
+          {sidebarOpen && (
+            <Link to="/" style={{ display: 'block' }}>
+              <span className="logo" style={{ fontSize: 20, color: 'var(--text)', fontWeight: 700 }}>Finstagram</span>
+            </Link>
+          )}
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--text)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px',
+              borderRadius: 8,
+              transition: 'background 0.2s ease',
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
+            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
 
         {/* Nav items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
@@ -46,7 +73,8 @@ export default function Navbar() {
             const active = isActive(to)
             return (
               <Link key={to} to={to} style={{
-                display: 'flex', alignItems: 'center', gap: 16,
+                display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                gap: 16,
                 padding: '12px 12px',
                 borderRadius: 10,
                 color: 'var(--text)',
@@ -55,29 +83,32 @@ export default function Navbar() {
                 fontSize: 15,
                 background: active ? 'var(--surface2)' : 'transparent',
                 transition: 'background 0.2s ease',
-                position: 'relative',
               }}
               onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'var(--surface2)' }}
               onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
+              title={!sidebarOpen ? label : ''}
               >
                 {isProfile && profile?.avatar_url ? (
                   <img src={profile.avatar_url} style={{
-                    width: 26, height: 26, borderRadius: '50%', objectFit: 'cover',
+                    width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
                     outline: active ? '2px solid var(--text)' : 'none',
                     outlineOffset: 2,
                   }} />
                 ) : (
-                  <Icon size={24} strokeWidth={active ? 2.5 : 2} />
+                  <Icon size={24} strokeWidth={active ? 2.5 : 2} style={{ flexShrink: 0 }} />
                 )}
-                <span>{label}</span>
+                {sidebarOpen && <span>{label}</span>}
               </Link>
             )
           })}
         </div>
 
         {/* Theme toggle */}
-        <button onClick={toggleTheme} style={{
-          display: 'flex', alignItems: 'center', gap: 16,
+        <button onClick={toggleTheme} 
+          title={theme === 'light' ? 'Dark mode' : 'Light mode'}
+          style={{
+          display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'flex-start' : 'center',
+          gap: 16,
           padding: '12px 12px',
           borderRadius: 10,
           color: 'var(--text)',
@@ -93,8 +124,8 @@ export default function Navbar() {
         onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
         >
-          {theme === 'light' ? <Moon size={24} strokeWidth={2} /> : <Sun size={24} strokeWidth={2} />}
-          <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+          {theme === 'light' ? <Moon size={24} strokeWidth={2} style={{ flexShrink: 0 }} /> : <Sun size={24} strokeWidth={2} style={{ flexShrink: 0 }} />}
+          {sidebarOpen && <span>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>}
         </button>
       </nav>
 
