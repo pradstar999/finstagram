@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { SidebarProvider } from './context/SidebarContext'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Feed from './pages/Feed'
@@ -24,18 +25,20 @@ export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
-            <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
-            <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-            <Route path="/reels" element={<ProtectedRoute><Reels /></ProtectedRoute>} />
-            <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
-          </Routes>
-        </BrowserRouter>
+        <SidebarProvider>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/" element={<ProtectedRoute><Feed /></ProtectedRoute>} />
+              <Route path="/profile/:username" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              <Route path="/explore" element={<ProtectedRoute><Explore /></ProtectedRoute>} />
+              <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+              <Route path="/reels" element={<ProtectedRoute><Reels /></ProtectedRoute>} />
+              <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
+            </Routes>
+          </BrowserRouter>
+        </SidebarProvider>
       </AuthProvider>
     </ThemeProvider>
   )

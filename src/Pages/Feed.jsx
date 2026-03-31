@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import { useAuth } from '../context/AuthContext'
+import { useSidebar } from '../context/SidebarContext'
 import Navbar from '../components/Navbar'
 import PostCard from '../components/PostCard'
 import Stories from '../components/Stories'
 
 export default function Feed() {
   const { user, profile } = useAuth()
+  const { sidebarOpen } = useSidebar()
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -24,6 +26,8 @@ export default function Feed() {
     setLoading(false)
   }
 
+  const sidebarWidth = sidebarOpen ? 256 : 80
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <Navbar />
@@ -31,7 +35,12 @@ export default function Feed() {
       {/* Mobile top spacer */}
       <div className="md:hidden" style={{ height: 56 }} />
 
-      <div className="md:ml-64" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{
+        marginLeft: `${sidebarWidth}px`,
+        display: 'flex',
+        justifyContent: 'center',
+        transition: 'margin-left 0.3s ease',
+      }}>
         <div style={{ width: '100%', maxWidth: 470, padding: '24px 12px 80px' }}>
           <Stories />
 
